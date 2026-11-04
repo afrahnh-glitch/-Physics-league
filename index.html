@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>دوري الفيزياء</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دوري الفيزياء">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+:root {
+    --bg-1: #0a0e1a;
+    --bg-2: #10162a;
+    --card: #171f38;
+    --card-2: #1f2a4a;
+    --border: rgba(255,255,255,0.08);
+    --accent: #3b82f6;
+    --accent-2: #8b5cf6;
+    --gold: #fbbf24;
+    --green: #22c55e;
+    --red: #ef4444;
+    --text: #eef1f9;
+    --text-dim: #8b95b6;
+    --radius-lg: 18px;
+    --radius-md: 14px;
+    --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: radial-gradient(ellipse at top, var(--bg-2) 0%, var(--bg-1) 65%);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif;
+    direction: rtl;
+    text-align: right;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  #app { padding: 16px 14px 28px; max-width: 480px; width: 100%; margin: 0 auto; }
+
+  @media (min-width: 620px) {
+    body { display: flex; justify-content: center; }
+    #app { max-width: 560px; padding-top: 30px; }
+    .points-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  }
+  @media (min-width: 900px) {
+    #app { max-width: 640px; }
+    .points-grid { grid-template-columns: repeat(4, 1fr) !important; }
+  }
+
+  /* ---------------- الترويسة ---------------- */
+  .app-header { text-align: center; margin-bottom: 12px; }
+  .app-title {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--gold), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2px;
+  }
+  .app-subtitle {
+    font-size: 10.5px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    font-weight: 600;
+  }
+  .app-teacher {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 700;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    display: inline-block;
+  }
+
+  /* ---------------- التبويبات ---------------- */
+  .tab-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: var(--card);
+    padding: 5px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 11px 6px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: all .15s ease;
+  }
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59,130,246,0.35);
+  }
+
+  .section-heading {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--text);
+    margin: 18px 4px 10px;
+    padding-inline-start: 10px;
+    border-inline-start: 4px solid var(--accent-2);
+  }
+  .section-heading:first-of-type { margin-top: 4px; }
+
+  /* ---------------- بطاقات عامة ---------------- */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  }
+
+  .empty-box, .loading-box {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13.5px;
+    padding: 22px 10px;
+    background: var(--card);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border);
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 10.5px;
+    color: var(--text-dim);
+    margin: 10px 0 6px;
+  }
+
+  /* ---------------- الأزرار العامة ---------------- */
+  .btn {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 14px 10px;
+    font-size: 14.5px;
+    font-weight: 800;
+    cursor: pointer;
+    color: #fff;
+    transition: transform .08s ease, opacity .15s ease;
+    margin-top: 10px;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+  .btn-start { background: linear-gradient(135deg, var(--green), #16a34a); }
+  .btn-secondary {
+    background: var(--card-2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    font-weight: 700;
+    font-size: 13px;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--card-2);
+    color: var(--text);
+    font-size: 15px;
+  }
+  .field-label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  /* ================= 🏆 لوحة المنافسة ================= */
+  .leaderboard { display: flex; flex-direction: column; gap: 12px; }
+
+  .leader-card {
+    background: var(--card);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  }
+  .leader-card.top-1 { border-color: rgba(251,191,36,0.5); background: linear-gradient(160deg, #241d0d, var(--card)); }
+  .leader-card.top-2 { border-color: rgba(203,213,225,0.35); }
+  .leader-card.top-3 { border-color: rgba(217,119,6,0.4); }
+
+  .leader-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .leader-rank { font-size: 22px; line-height: 1; }
+  .leader-name { font-size: 18px; font-weight: 800; }
+
+  .leader-points {
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .progress-outer {
+    width: 100%;
+    height: 12px;
+    border-radius: 8px;
+    background: var(--card-2);
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 8px;
+    transition: width .5s ease;
+  }
+
+  .leader-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+  .meta-pill {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: var(--card-2);
+    border: 1px solid var(--border);
+  }
+  .level-pill { color: #86efac; }
+
+  /* آخر إنجاز */
+  .last-achievement-card { text-align: center; }
+  .achv-class { font-size: 13px; color: var(--text-dim); font-weight: 700; margin-bottom: 4px; }
+  .achv-line { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+  .achv-time { font-size: 11px; color: var(--text-dim); }
+
+  /* إنجازات الأسبوع */
+  .badge-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 2px;
+    border-bottom: 1px dashed var(--border);
+    font-size: 13px;
+  }
+  .badge-row:last-child { border-bottom: none; }
+  .badge-label { font-weight: 700; }
+  .badge-holder { color: var(--accent); font-weight: 800; font-size: 12.5px; }
+
+  /* ================= ⚡ إضافة نقاط ================= */
+  .session-card { }
+  .session-live { text-align: center; }
+  .session-live-label { font-size: 12px; color: var(--text-dim); font-weight: 700; margin-bottom: 2px; }
+  .session-live-class { font-size: 24px; font-weight: 900; color: var(--gold); margin-bottom: 4px; }
+  .session-live-status { font-size: 12.5px; color: var(--green); font-weight: 700; margin-bottom: 8px; }
+  .session-live-points { font-size: 13px; color: var(--text-dim); }
+  .session-live-points b { color: var(--accent); font-size: 16px; }
+
+  .btn-end {
+    background: linear-gradient(135deg, var(--red), #b91c1c);
+    padding: 12px 10px;
+    font-size: 13.5px;
+  }
+
+  .category-block { margin-bottom: 14px; }
+  .category-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    padding: 3px 10px;
+    border-inline-start: 4px solid var(--accent-2);
+  }
+
+  .points-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .point-btn {
+    background: linear-gradient(160deg, var(--card-2), var(--card));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: transform .08s ease, border-color .15s ease;
+    min-height: 84px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .point-btn:active { transform: scale(0.94); border-color: var(--accent); }
+  .point-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .point-btn .emoji { font-size: 26px; }
+  .point-btn .name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+  .point-btn .val { font-size: 12px; color: var(--gold); font-weight: 900; }
+
+  .btn-undo {
+    background: var(--card-2);
+    color: var(--text-dim);
+    border: 1px dashed var(--border);
+    font-size: 13px;
+    padding: 12px 10px;
+  }
+
+  /* ---------------- الإشعارات (Toast) ---------------- */
+  #toast-container {
+    position: fixed;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    width: 92%;
+    max-width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+  }
+  .toast {
+    background: linear-gradient(135deg, var(--card-2), var(--card));
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    text-align: center;
+    font-size: 13.5px;
+    line-height: 1.5;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+    animation: fadeInOut 2.1s ease forwards;
+  }
+  .toast.error { border-color: var(--red); }
+  .toast.levelup {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #3d3110, var(--card));
+  }
+  .toast b { color: var(--gold); }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    12% { opacity: 1; transform: translateY(0); }
+    82% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-8px); }
+  }
+  /* ---------------- الإعدادات ---------------- */
+  [hidden] { display: none !important; }
+  .set-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+  .set-row:last-of-type { border-bottom: none; }
+  .inp { flex: 1 1 110px; min-width: 0; padding: 11px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card-2); color: var(--text); font-size: 15px; font-family: inherit; }
+  .inp.emo { flex: 0 0 56px; text-align: center; font-size: 18px; }
+  .inp.sel { flex: 0 0 96px; }
+  .inp[type=number] { flex: 0 0 76px; width: 76px; text-align: center; }
+  .mini .inp { flex: none; width: 84px; }
+  .mini { flex: 0 0 auto; }
+  .mini { display: flex; flex-direction: column; gap: 3px; font-size: 10.5px; color: var(--text-dim); font-weight: 600; }
+  .icon-btn { flex: 0 0 auto; border: none; background: transparent; font-size: 20px; padding: 8px; cursor: pointer; border-radius: 10px; }
+  .icon-btn:active { background: var(--card-2); }
+  .hint { font-size: 11.5px; color: var(--text-dim); margin-top: 10px; line-height: 1.6; }
+  .btn-danger { background: linear-gradient(135deg, #7f1d1d, #b91c1c); font-size: 13px; padding: 12px 10px; }
+  .tab-btn { font-size: 12.5px; padding: 11px 4px; }
+  .app-teacher { display: inline-block; }
+
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+<div id="app"></div>
+<script src="seed.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
